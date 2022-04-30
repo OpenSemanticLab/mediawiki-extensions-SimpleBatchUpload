@@ -96,13 +96,25 @@ class UploadButtonRenderer {
 					'</span>' .
 				'</label><br> '.
 				'<span class="fileupload-dropzone fileinput-button"> ' .
-					'<i class="glyphicon glyphicon-plus"></i> ' .
-					'<span>' . \Message::newFromKey( 'simplebatchupload-buttonlabel' )->escaped() . '</span> ' .
+					//'<i class="glyphicon glyphicon-plus"></i> ' .
+					'<span>&#x1F4CE; ' . \Message::newFromKey( 'simplebatchupload-buttonlabel' )->escaped() . '</span> ' . //UTF icon 'paperclip'
 					'<!-- The file input field used as target for the file upload widget -->' .
 					'<input class="fileupload" type="file" name="file" multiple ' .
 					'    data-url="' . wfScript( 'api' ) . '" ' .
 					'    data-comment="' . $escapedUploadComment . '" ' .
 					'> ' .
+					//'</span>' .
+					//Desktop browsers always show a file select dialog for a file input
+					//Mobile Chrome shows a dialog to select a file or open the camera
+					//Mobile Firefox only opens the camera with 'accept="image/*" capture' attributes
+					//to support both file and camera, we need to add a second input element
+					'<span class="fileupload-dropzone fileinput-button fileupload-camera"> ' .
+						'<span>&#128247; ' . \Message::newFromKey( 'simplebatchupload-cameraButtonlabel' )->escaped() . '</span> ' . //UTF icon 'camera'
+						'<input class="fileupload" type="file" name="file" accept="image/*" capture' .
+						'    data-url="' . wfScript( 'api' ) . '" ' .
+						'    data-comment="' . $escapedUploadComment . '" ' .
+						'> ' . 
+					'</span>' .
 				'</span><ul class="fileupload-results"></ul> ' .
 			'</div>';
 	}

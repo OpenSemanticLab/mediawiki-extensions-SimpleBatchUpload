@@ -39,18 +39,26 @@
 				}
 			} );
 		}
+		
+		var bMobile =   // will be true if running on a mobile device
+		navigator.userAgent.indexOf( "Mobile" ) !== -1 || 
+		navigator.userAgent.indexOf( "iPhone" ) !== -1 || 
+		navigator.userAgent.indexOf( "Android" ) !== -1 || 
+		navigator.userAgent.indexOf( "Windows Phone" ) !== -1 ;
+		if (!bMobile) $('.fileupload-camera').hide(); //hide camera upload on desktop
+
 
 		$( 'div.fileupload-container' ).each( function () {
 
 			var container = this;
 
-			$( 'input.fileupload', container )
-
+			$( 'input.fileupload', container ).each( function () {
+			$(this)
 			.on( 'change drop', function ( /* e, data */ ) { $( 'ul.fileupload-results', container ).empty(); } )
 
 			.fileupload( {
 				dataType: 'json',
-				dropZone: $( '.fileupload-dropzone', container ),
+				dropZone:  $(this).closest( '.fileupload-dropzone' ), //select not all but the nearest dropzone
 				progressInterval: 100,
 
 				add: function ( e, data ) {
@@ -155,6 +163,7 @@
 						status.text( status.data('filenode_text') + ' ' + parseInt( data.loaded / data.total * 100, 10 ) + '%' );
 					}
 				}
+			} );
 			} );
 		} );
 
