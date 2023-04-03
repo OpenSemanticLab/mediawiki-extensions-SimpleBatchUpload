@@ -30,7 +30,9 @@
 
 		var filesLimitPerBatchConfig = mw.config.get( 'simpleBatchUploadMaxFilesPerBatch' ),
 			userGroups = mw.config.get( 'wgUserGroups' ),
-			userUploadLimit = 0;
+			userUploadLimit = 0,
+			uploadCount = 0,
+			filesUploaded = [];
 
 		if ( filesLimitPerBatchConfig ) {
 			$.each( filesLimitPerBatchConfig, function ( role, limit ) {
@@ -47,6 +49,11 @@
 		navigator.userAgent.indexOf( "Windows Phone" ) !== -1 ;
 		if (!bMobile) $('.fileupload-camera').hide(); //hide camera upload on desktop
 
+		function uuidv4() {
+			return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+				(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+			);
+		}
 
 		$( 'div.fileupload-container' ).each( function () {
 
@@ -74,7 +81,8 @@
 
 					var src_filename = data.files[ 0 ].name;
 					var filenode_text = src_filename;
-					var dst_filename = src_filename
+					//var dst_filename = src_filename
+					var dst_filename = "OSW" + uuidv4().replaceAll("-","");// + src_filename.split(".")[src_filename.split(".").length - 1]
 					var textdata = $(container).find('[name="wfUploadDescription"]').val();
 					// It matches:
 					//   other| +rename = !(\w+)[ -_/]*! =$1-}}
@@ -126,7 +134,7 @@
 
 							data.submit()
 							.success( function ( result /*, textStatus, jqXHR */ ) {
-
+								uploadCount += 1;
 								if ( result.error !== undefined ) {
 
 									status.text( status.text() + " ERROR: " + result.error.info ).addClass( 'ful-error api-error' );
@@ -141,10 +149,26 @@
 									.addClass( 'ful-success' )
 									.text( ' OK' )
 									.prepend( link );
+									console.log("Upload " + uploadCount + "/" + data.originalFiles.length);
+									var suffix = src_filename.split(".")[src_filename.split(".").length-1]; //e.g. ".png"
+									var file_label = src_filename.replace("." + suffix, "");
+									filesUploaded.push({exists: false, name: result.upload.filename, label: file_label})
+									mw.hook( 'simplebatchupload.file.uploaded' ).fire({exists: false, name: result.upload.filename, label: file_label});
+								}
+								if (uploadCount === data.originalFiles.length) {
+									mw.hook( 'simplebatchupload.files.uploaded' ).fire({files: filesUploaded});
+									uploadCount = 0;
+									filesUploaded = [];
 								}
 
 							} )
 							.error( function ( /* jqXHR, textStatus, errorThrown */ ) {
+								uploadCount += 1;
+								if (uploadCount === data.originalFiles.length) {
+									mw.hook( 'simplebatchupload.files.uploaded' ).fire({files: filesUploaded});
+									uploadCount = 0;
+									filesUploaded = [];
+								}
 								status.text( status.text() + " ERROR: Server communication failed." ).addClass( 'ful-error server-error' );
 								// console.log( JSON.stringify( arguments ) );
 							} );
