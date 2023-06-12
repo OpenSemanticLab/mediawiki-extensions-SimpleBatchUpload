@@ -133,7 +133,7 @@
 							};
 
 							data.submit()
-							.success( function ( result /*, textStatus, jqXHR */ ) {
+							.done( function ( result /*, textStatus, jqXHR */ ) {
 								uploadCount += 1;
 								if ( result.error !== undefined ) {
 
@@ -162,7 +162,7 @@
 								}
 
 							} )
-							.error( function ( /* jqXHR, textStatus, errorThrown */ ) {
+							.fail( function ( /* jqXHR, textStatus, errorThrown */ ) {
 								uploadCount += 1;
 								if (uploadCount === data.originalFiles.length) {
 									mw.hook( 'simplebatchupload.files.uploaded' ).fire({files: filesUploaded});
