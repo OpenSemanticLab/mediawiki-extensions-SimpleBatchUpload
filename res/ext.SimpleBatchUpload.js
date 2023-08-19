@@ -99,7 +99,7 @@
 						filenode_text = ( dst_filename == src_filename ) ?
 							src_filename : `${src_filename} --> ${dst_filename}`;
 					}
-					
+
 					var status = $( '<li>' )
 					.attr( 'id', data.id )
 					.text( filenode_text )
@@ -110,10 +110,6 @@
 					var api = new mw.Api();
 
 					var tokenType = 'csrf';
-
-					if ( mw.config.get( 'wgVersion' ) < '1.27.0' ) {
-						tokenType = 'edit';
-					}
 
 					// invalidate cached token; always request a new one
 					api.badToken( tokenType );
@@ -134,7 +130,9 @@
 
 							data.submit()
 							.done( function ( result /*, textStatus, jqXHR */ ) {
+
 								uploadCount += 1;
+
 								if ( result.error !== undefined ) {
 
 									status.text( status.text() + " ERROR: " + result.error.info ).addClass( 'ful-error api-error' );
@@ -164,11 +162,13 @@
 							} )
 							.fail( function ( /* jqXHR, textStatus, errorThrown */ ) {
 								uploadCount += 1;
+
 								if (uploadCount === data.originalFiles.length) {
 									mw.hook( 'simplebatchupload.files.uploaded' ).fire({files: filesUploaded});
 									uploadCount = 0;
 									filesUploaded = [];
 								}
+
 								status.text( status.text() + " ERROR: Server communication failed." ).addClass( 'ful-error server-error' );
 								// console.log( JSON.stringify( arguments ) );
 							} );
