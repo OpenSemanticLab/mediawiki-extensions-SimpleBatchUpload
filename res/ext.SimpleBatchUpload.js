@@ -93,12 +93,18 @@
 					var rename_regex = /\|\s*\+rename\s*=\s*([#\/@!])(.+)\1([gimuy]{0,5})\s*-->(.*?)(?=\||}}\s*$)/;
 					var match = rename_regex.exec(textdata);
 					if ( match ) {
+						// found a renaming template
 						var pattern = RegExp(match[2], match[3]);
 						var replace = match[4];
 						dst_filename = src_filename.replace(pattern, replace);
-						filenode_text = ( dst_filename == src_filename ) ?
-							src_filename : `${src_filename} --> ${dst_filename}`;
 					}
+					else {
+						// extract the extension
+						var parts = src_filename.split(".");
+						if (parts.length > 1) dst_filename += "." + parts[parts.length - 1];
+					}
+					filenode_text = ( dst_filename == src_filename ) ?
+					src_filename : `${src_filename} --> ${dst_filename}`;
 
 					var status = $( '<li>' )
 					.attr( 'id', data.id )
