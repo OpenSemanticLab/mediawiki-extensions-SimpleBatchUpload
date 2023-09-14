@@ -81,8 +81,8 @@
 
 					var src_filename = data.files[ 0 ].name;
 					var filenode_text = src_filename;
-					//var dst_filename = src_filename
-					var dst_filename = "OSW" + uuidv4().replaceAll("-","");// + src_filename.split(".")[src_filename.split(".").length - 1]
+					//use uuid + all file extensions, e.g. '.png' or '.drawio.svg'
+					var dst_filename = src_filename.replace(src_filename.split(".")[0], "OSW" + uuidv4().replaceAll("-",""));
 					var textdata = $(container).find('[name="wfUploadDescription"]').val();
 					// It matches:
 					//   other| +rename = !(\w+)[ -_/]*! =$1-}}
